@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  db_postgres:
+    image: postgres:15-alpine
+    container_name: postgres_credenciales
+    restart: always
+    environment:
+      POSTGRES_USER: RavenAdmin
+      POSTGRES_PASSWORD: Kaoriko2
+      POSTGRES_DB: sistema_qr
+    ports:
+      - "5432:5432"
+    volumes:
+      # Esta línea mete tu archivo a la base de datos
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      # Esta línea guarda los datos para que no se borren
+      - pgdata:/var/lib/postgresql/data
+
+  cache_redis:
+    image: redis:alpine
+    container_name: redis_credenciales
+    restart: always
+    ports:
+      - "6379:6379"
+
+  panel_adminer:
+    image: adminer
+    container_name: adminer_credenciales
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db_postgres
+
+# IMPORTANTE: No olvides poner esto hasta el final
+volumes:
+  pgdata:

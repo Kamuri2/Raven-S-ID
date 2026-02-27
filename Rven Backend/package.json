@@ -1,0 +1,19 @@
+{
+  "name": "zen-server",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Servidor Apollo para validación de credenciales",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.10.0",
+    "graphql": "^16.8.1",
+    "pg": "^8.18.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
