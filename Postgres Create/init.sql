@@ -128,38 +128,48 @@ CREATE INDEX idx_registros_credencial ON registros_acceso(id_credencial);
 CREATE INDEX idx_credenciales_qr ON credenciales(codigo_qr_hash);
 CREATE INDEX idx_alumnos_matricula ON alumnos(matricula);
 
--- ==========================================
--- DATOS DE PRUEBA INICIALES (SEED DATA)
--- ==========================================
 
--- 1. Creamos 3 Carreras (IDs 1, 2 y 3)
-INSERT INTO carreras (nombre, clave) VALUES 
-('Ingeniería en Sistemas Computacionales', 'ISC-2026'),
-('Ingeniería Industrial', 'IND-2026'),
-('Licenciatura en Administración', 'LAD-2026');
+--DATOS DE PRUEBA: ALUMNOS, EMPLEADOS Y ACCESOS
 
--- 2. Creamos 15 Grupos variados
--- Los primeros 10 grupos son de Sistemas (id_carrera = 1)
-INSERT INTO grupos (nombre, semestre, id_carrera) VALUES 
-('Grupo 1-A', 1, 1),  -- ID: 1
-('Grupo 1-B', 1, 1),  -- ID: 2
-('Grupo 2-A', 2, 1),  -- ID: 3
-('Grupo 2-B', 2, 1),  -- ID: 4
-('Grupo 3-A', 3, 1),  -- ID: 5
-('Grupo 3-B', 3, 1),  -- ID: 6
-('Grupo 4-A', 4, 1),  -- ID: 7
-('Grupo 4-B', 4, 1),  -- ID: 8
-('Grupo 5-A', 5, 1),  -- ID: 9
-('Grupo 5-B', 5, 1),  -- ID: 10
-('Grupo 6-A', 6, 1),  -- ID: 11
-('Grupo Especial', 6, 1); -- ID: 12
 
--- Grupos de Industrial (id_carrera = 2)
-INSERT INTO grupos (nombre, semestre, id_carrera) VALUES 
-('Industrial 1-A', 1, 2), -- ID: 13
-('Industrial 2-A', 2, 2); -- ID: 14
+--Agregar Departamentos (Para los empleados)
+INSERT INTO departamentos (nombre_depto) VALUES 
+('Sistemas y Computación'),
+('Administración Escolar');
 
--- 3. (Opcional) Un usuario administrador de prueba para que puedas probar tu login de React
-INSERT INTO roles (nombre_rol) VALUES ('Administrador_Global');
-INSERT INTO usuarios_sistema (username, password, id_rol) 
-VALUES ('admin_raven', 'admin123', 1);
+--  Agregar Empleados (Profesores / Staff)
+INSERT INTO empleados (num_empleado, nombre_completo, id_departamento) VALUES 
+('EMP-1001', 'Roberto Gómez Bolaños', 1),
+('EMP-1002', 'Carmen Salinas', 2);
+
+-- Agregar Alumnos (En diferentes grupos y estados)
+INSERT INTO alumnos (matricula, nombre_completo, id_grupo, estado_academico) VALUES 
+('23010001', 'Juan Pérez Gómez', 1, 'Activo'),          -- Alumno normal
+('23010002', 'María López Ruiz', 1, 'Activo'),          -- Alumno normal
+('23010003', 'Carlos Sánchez', 12, 'Activo'),           -- Del "Grupo Especial"
+('23020001', 'Luis Ramírez', 13, 'Baja Temporal'),      -- Alumno inactivo
+('23010005', 'Ana Torres', 2, 'Activo');                -- Alumno que tendrá sanción
+
+-- Poner una Sanción de prueba
+INSERT INTO sanciones (id_alumno, motivo, bloquea_acceso, fecha_fin) VALUES 
+(5, 'Adeudo de colegiatura o biblioteca', true, '2026-03-15'); -- Ana Torres está bloqueada
+
+-- Generar Credenciales (Con códigos QR simulados)
+INSERT INTO credenciales (id_alumno, id_empleado, codigo_qr_hash, fecha_vencimiento, estado) VALUES 
+(1, NULL, 'hash_juan_qr_123', '2026-12-31', 'Activa'),      -- ID Credencial 1 (Juan)
+(2, NULL, 'hash_maria_qr_456', '2026-12-31', 'Activa'),     -- ID Credencial 2 (María)
+(4, NULL, 'hash_luis_qr_789', '2026-12-31', 'Inactiva'),    -- ID Credencial 3 (Luis, Inactivo)
+(NULL, 1, 'hash_profe_roberto_qr', '2030-12-31', 'Activa'); -- ID Credencial 4 (Profe Roberto)
+
+-- Crear Puntos de Acceso físicos
+INSERT INTO puntos_acceso (ubicacion, tipo) VALUES 
+('Edificio Principal', 'Torniquete Principal'),
+('Edificio de Sistemas', 'Laboratorio de Cómputo');
+
+-- Simular un Historial de Escaneos (Para que tu tabla masiva no esté vacía)
+INSERT INTO registros_acceso (id_credencial, id_punto, acceso_concedido, motivo_rechazo) VALUES 
+(1, 1, true, NULL),                                      -- Juan entró al Edificio Principal
+(2, 1, true, NULL),                                      -- María entró al Edificio Principal
+(4, 2, true, NULL),                                      -- El profe entró al Laboratorio
+(3, 1, false, 'Credencial Inactiva - Baja Temporal'),    -- Luis intentó entrar pero el sistema lo rebotó
+(1, 1, true, NULL);                                      -- Juan volvió a escanear más tarde
