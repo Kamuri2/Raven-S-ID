@@ -1,5 +1,5 @@
 -- ==========================================
--- SCRIPT DE INICIALIZACIÓN - SISTEMA EL-PIOJO
+-- SCRIPT DE INICIALIZACIÓN - Ravens
 -- Este script crea las tablas e inserta datos 
 -- automáticamente al levantar el contenedor.
 -- ==========================================
